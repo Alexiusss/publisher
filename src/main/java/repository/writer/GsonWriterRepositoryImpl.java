@@ -19,10 +19,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
 
     @Override
     public Writer getById(String id) throws IOException {
-        return getListFromFile(gson, fileName, Writer.class).stream()
-                .filter(writer -> writer.getId().equals(id))
-                .findAny()
-                .orElseThrow();
+       return getByIdFromList(getListFromFile(gson, fileName, Writer.class), id);
     }
 
     @Override
@@ -32,8 +29,8 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
 
     @Override
     public Writer save(Writer writer) throws IOException {
-        writer.setId(generateNewId());
         List<Writer> writerList = getListFromFile(gson, fileName, Writer.class);
+        writer.setId(generateNewId());
         writerList.add(writer);
         saveToFile(writerList, gson, fileName);
         return writer;
@@ -41,14 +38,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
 
     @Override
     public Writer update(Writer updatedWriter) throws IOException {
-        List<Writer> writerList = getListFromFile(gson, fileName, Writer.class).stream()
-                .map(writer -> {
-                    if (writer.getId().equals(updatedWriter.getId())) {
-                        return updatedWriter;
-                    }
-                    return writer;
-                })
-                .collect(Collectors.toList());
+        List<Writer> writerList = updateEntityInList(getListFromFile(gson, fileName, Writer.class), updatedWriter);
         saveToFile(writerList, gson, fileName);
         return updatedWriter;
     }

@@ -24,6 +24,13 @@ public class Util {
         return randomInt + "" + currentTimeNano;
     }
 
+    public static <T extends BaseEntity> T getByIdFromList(List<T> list, String id) {
+        return list.stream()
+                .filter(entity -> entity.getId().equals(id))
+                .findAny()
+                .orElseThrow();
+    }
+
     public static <T extends BaseEntity> List<T> getListFromFile(Gson gson, String fileName, Class<T> clazz) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName))) {
             JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
@@ -33,11 +40,22 @@ public class Util {
         }
     }
 
-    public static <T extends BaseEntity> void saveToFile(List<T> list, Gson gson, String fileName) throws IOException {
+    public static <T extends BaseEntity> void saveToFile(List<T> list, Gson gson, String fileName) {
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             gson.toJson(list, fileWriter);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static <T extends BaseEntity> List<T> updateEntityInList(List<T> list, T updatedEntity) {
+        return list.stream()
+                .map(entity -> {
+                    if (entity.getId().equals(updatedEntity.getId())) {
+                        return updatedEntity;
+                    }
+                    return entity;
+                })
+                .collect(Collectors.toList());
     }
 }
