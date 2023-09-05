@@ -20,6 +20,7 @@ public class GsonPostRepositoryImpl implements PostRepository {
         return getByIdFromList(getListFromFile(gson, fileName, Post.class), id);
     }
 
+    @Override
     public List<Post> getAllByWriterId(String writerId) throws IOException {
         return getListFromFile(gson, fileName, Post.class).stream()
                 .filter(writer -> writer.getId().equals(writerId))
@@ -41,8 +42,10 @@ public class GsonPostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Post update(Post post) {
-        return null;
+    public Post update(Post updatedPost) throws IOException {
+        List<Post> writerList = updateEntityInList(getListFromFile(gson, fileName, Post.class), updatedPost);
+        saveToFile(writerList, gson, fileName);
+        return updatedPost;
     }
 
     @Override
