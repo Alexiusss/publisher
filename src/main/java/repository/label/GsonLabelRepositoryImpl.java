@@ -1,6 +1,7 @@
 package repository.label;
 
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
 import model.Label;
 import model.Status;
 
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static util.Util.*;
 
+@AllArgsConstructor
 public class GsonLabelRepositoryImpl implements LabelRepository {
 
     Gson gson;

@@ -1,6 +1,7 @@
 package repository.post;
 
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
 import model.Post;
 import model.PostStatus;
 
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static util.Util.*;
 
+@AllArgsConstructor
 public class GsonPostRepositoryImpl implements PostRepository {
 
     Gson gson;
