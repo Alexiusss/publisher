@@ -6,11 +6,18 @@ import controller.LabelController;
 import controller.PostController;
 import controller.WriterController;
 import lombok.AllArgsConstructor;
+import model.BaseEntity;
 import repository.label.GsonLabelRepositoryImpl;
 import repository.post.GsonPostRepositoryImpl;
 import repository.writer.GsonWriterRepositoryImpl;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class GsonView {
@@ -28,7 +35,7 @@ public class GsonView {
                 .create();
         labelController = new LabelController(new GsonLabelRepositoryImpl(gson, "src/main/resources/store/labels.json"));
         postController = new PostController(new GsonPostRepositoryImpl(gson, "src/main/resources/store/posts.json"));
-        writerController = new WriterController(new GsonWriterRepositoryImpl(gson, "src/main/resources/store/posts.json"));
+        writerController = new WriterController(new GsonWriterRepositoryImpl(gson, "src/main/resources/store/writers.json"));
     }
 
     private void start() throws IOException {
@@ -37,17 +44,7 @@ public class GsonView {
 
     private void mainMenu() throws IOException {
         clearConsole();
-        System.out.println("==================================");
-        System.out.println("||         Главное меню         ||");
-        System.out.println("==================================");
-        System.out.println("||Введите номер меню из списка: ||");
-        System.out.println("||                              ||");
-        System.out.println("||  1. Писатели                 ||");
-        System.out.println("||  2. Публикации               ||");
-        System.out.println("||  3. Лэйблы                   ||");
-        System.out.println("||                              ||");
-        System.out.println("||   Наберите exit для выхода   ||");
-        System.out.println("==================================\n\n\n");
+        printMainMenu();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String input;
@@ -83,6 +80,7 @@ public class GsonView {
                 switch (input) {
                     case "1":
                         //1. Просмотреть всех
+                        printList(writerController.getAll(), List.of("posts"));
                         break;
                     case "2":
                         // 2. Найти по ID
@@ -103,7 +101,7 @@ public class GsonView {
                         break;
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -116,7 +114,21 @@ public class GsonView {
         printMenuOptions("  Лэйблы  ");
     }
 
-    private void printMenuOptions(String menuName) throws IOException {
+    private void printMainMenu() {
+        System.out.println("==================================");
+        System.out.println("||         Главное меню         ||");
+        System.out.println("==================================");
+        System.out.println("||Введите номер меню из списка: ||");
+        System.out.println("||                              ||");
+        System.out.println("||  1. Писатели                 ||");
+        System.out.println("||  2. Публикации               ||");
+        System.out.println("||  3. Лэйблы                   ||");
+        System.out.println("||                              ||");
+        System.out.println("||   Наберите exit для выхода   ||");
+        System.out.println("==================================\n\n\n");
+    }
+
+    private void printMenuOptions(String menuName) {
         clearConsole();
 
         System.out.println("==================================");
@@ -133,6 +145,65 @@ public class GsonView {
         System.out.println("||   Наберите exit для выхода   ||");
         System.out.println("==================================\n\n\n");
 
+    }
+
+    private <T extends BaseEntity> void printList(List<T> list, List<String> ignoredFields) throws NoSuchFieldException, IllegalAccessException {
+        if (list.size() > 0) {
+            Class<?> clazz = list.get(0).getClass();
+            List<Field> fields = new ArrayList<>(List.of(clazz.getSuperclass().getDeclaredFields()));
+            fields.addAll(List.of(clazz.getDeclaredFields()));
+
+            List<Field> filteredFields = fields.stream()
+                    .filter(field -> !ignoredFields.contains(field.getName()))
+                    .collect(Collectors.toList());
+
+            List<String> fieldsNames = fields.stream()
+                    .map(Field::getName)
+                    .filter(field -> !ignoredFields.contains(field))
+                    .collect(Collectors.toList());
+
+            System.out.println("-------------------------------------------------------------------------------------");
+            System.out.println(createTableHeader(fieldsNames, ignoredFields));
+            System.out.println("-------------------------------------------------------------------------------------");
+
+            list.forEach(entity -> {
+                System.out.println(createTableRow(filteredFields, entity));
+            });
+
+            System.out.println("-------------------------------------------------------------------------------------");
+        }
+    }
+
+    private String createTableHeader(List<String> fieldNames, List<String> ignoredFields) {
+        StringBuilder headerBuilder = new StringBuilder();
+
+        fieldNames.forEach(fieldName -> {
+            if (!ignoredFields.contains(fieldName)) {
+                headerBuilder.append(fieldName);
+                headerBuilder.append(" ".repeat(25 - fieldName.length()));
+            }
+        });
+
+        return headerBuilder.toString();
+    }
+
+    private <T extends BaseEntity> String createTableRow(List<Field> fields, T entity) {
+        StringBuilder rowBuilder = new StringBuilder();
+
+        Class<?> clazz = entity.getClass();
+
+        fields.forEach(field -> {
+            try {
+                String fieldValue = (String) field.get(clazz);
+                rowBuilder.append(fieldValue);
+                rowBuilder.append(" ".repeat(25 - fieldValue.length()));
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return rowBuilder.toString();
     }
 
     private void clearConsole() {
