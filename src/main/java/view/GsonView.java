@@ -79,7 +79,6 @@ public class GsonView {
             while ((input = reader.readLine()) != null) {
                 switch (input) {
                     case "1":
-                        //1. Просмотреть всех
                         printList(writerController.getAll(), List.of("posts"));
                         break;
                     case "2":
@@ -92,6 +91,9 @@ public class GsonView {
                         //4. Отредактировать
                         break;
                     case "5":
+                        //5. Удалить
+                        break;
+                    case "6":
                         mainMenu();
                         break;
                     case "exit":
@@ -101,17 +103,75 @@ public class GsonView {
                         break;
                 }
             }
-        } catch (IOException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void postsMenu() throws IOException {
         printMenuOptions("Публикации");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            String input;
+            while ((input = reader.readLine()) != null) {
+                switch (input) {
+                    case "1":
+                        printList(postController.getAll(), List.of("labels"));
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        break;
+                    case "6":
+                        mainMenu();
+                        break;
+                    case "exit":
+                        return;
+                    default:
+                        System.out.println("Введены не корректные данные");
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void labelsMenu() throws IOException {
         printMenuOptions("  Лэйблы  ");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            String input;
+            while ((input = reader.readLine()) != null) {
+                switch (input) {
+                    case "1":
+                        printList(labelController.getAll(), List.of());
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        break;
+                    case "6":
+                        mainMenu();
+                        break;
+                    case "exit":
+                        return;
+                    default:
+                        System.out.println("Введены не корректные данные");
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printMainMenu() {
@@ -140,7 +200,8 @@ public class GsonView {
         System.out.println("||  2. Найти по ID              ||");
         System.out.println("||  3. Добавить                 ||");
         System.out.println("||  4. Отредактировать          ||");
-        System.out.println("||  5. Вернуться в главное меню ||");
+        System.out.println("||  5. Удалить  по ID           ||");
+        System.out.println("||  6. Вернуться в главное меню ||");
         System.out.println("||                              ||");
         System.out.println("||   Наберите exit для выхода   ||");
         System.out.println("==================================\n\n\n");
