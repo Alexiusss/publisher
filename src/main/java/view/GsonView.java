@@ -147,7 +147,8 @@ public class GsonView {
 
     }
 
-    private <T extends BaseEntity> void printList(List<T> list, List<String> ignoredFields) throws NoSuchFieldException, IllegalAccessException {
+    private <T extends BaseEntity> void printList(List<T> list, List<String> ignoredFields) {
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
         if (list.size() > 0) {
             Class<?> clazz = list.get(0).getClass();
             List<Field> fields = new ArrayList<>(List.of(clazz.getSuperclass().getDeclaredFields()));
@@ -157,30 +158,25 @@ public class GsonView {
                     .filter(field -> !ignoredFields.contains(field.getName()))
                     .collect(Collectors.toList());
 
-            List<String> fieldsNames = fields.stream()
-                    .map(Field::getName)
-                    .filter(field -> !ignoredFields.contains(field))
-                    .collect(Collectors.toList());
-
-            System.out.println("-------------------------------------------------------------------------------------");
-            System.out.println(createTableHeader(fieldsNames, ignoredFields));
-            System.out.println("-------------------------------------------------------------------------------------");
+            System.out.println(createTableHeader(filteredFields, ignoredFields));
+            System.out.println("-------------------------------------------------------------------------------------------------------------------");
 
             list.forEach(entity -> {
                 System.out.println(createTableRow(filteredFields, entity));
             });
-
-            System.out.println("-------------------------------------------------------------------------------------");
+        } else {
+            System.out.println("Записи отсутствуют");
         }
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
     }
 
-    private String createTableHeader(List<String> fieldNames, List<String> ignoredFields) {
+    private String createTableHeader(List<Field> fieldNames, List<String> ignoredFields) {
         StringBuilder headerBuilder = new StringBuilder();
 
         fieldNames.forEach(fieldName -> {
-            if (!ignoredFields.contains(fieldName)) {
-                headerBuilder.append(fieldName);
-                headerBuilder.append(" ".repeat(25 - fieldName.length()));
+            if (!ignoredFields.contains(fieldName.getName())) {
+                headerBuilder.append(fieldName.getName());
+                headerBuilder.append(" ".repeat(25 - fieldName.getName().length()));
             }
         });
 
@@ -190,11 +186,9 @@ public class GsonView {
     private <T extends BaseEntity> String createTableRow(List<Field> fields, T entity) {
         StringBuilder rowBuilder = new StringBuilder();
 
-        Class<?> clazz = entity.getClass();
-
         fields.forEach(field -> {
             try {
-                String fieldValue = (String) field.get(clazz);
+                String fieldValue = field.get(entity).toString();
                 rowBuilder.append(fieldValue);
                 rowBuilder.append(" ".repeat(25 - fieldValue.length()));
 

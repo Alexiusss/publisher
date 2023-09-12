@@ -12,11 +12,11 @@ import java.util.List;
 @Setter
 public class Writer extends BaseEntity {
     @Expose
-    String firstName;
+    public String firstName;
     @Expose
-    String lastName;
+    public String lastName;
     @Expose(serialize = false)
-    List<Post> posts;
+    public List<Post> posts;
     @Expose
-    Status status;
+    public Status status;
 }

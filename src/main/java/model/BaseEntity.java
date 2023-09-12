@@ -6,12 +6,12 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseEntity {
 
     @Expose
-    protected String id;
+    public String id;
 
     boolean isNew() {
         return id == null;
