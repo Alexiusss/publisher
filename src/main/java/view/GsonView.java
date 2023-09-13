@@ -2,6 +2,7 @@ package view;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import controller.BaseController;
 import controller.LabelController;
 import controller.PostController;
 import controller.WriterController;
@@ -38,26 +39,30 @@ public class GsonView {
         writerController = new WriterController(new GsonWriterRepositoryImpl(gson, "src/main/resources/store/writers.json"));
     }
 
-    private void start() throws IOException {
+    private void start() {
         mainMenu();
     }
 
-    private void mainMenu() throws IOException {
+    private void mainMenu() {
         clearConsole();
         printMainMenu();
+        boolean shouldExitFromMainMenu = false;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            String input;
-            while (((input = reader.readLine()) != null)) {
+            while (!shouldExitFromMainMenu) {
+                String input = reader.readLine();
                 switch (input) {
                     case "1":
-                        writersMenu();
+                        shouldExitFromMainMenu = true;
+                        writersMenu(reader);
                         break;
                     case "2":
-                        postsMenu();
+                        shouldExitFromMainMenu = true;
+                        postsMenu(reader);
                         break;
                     case "3":
-                        labelsMenu();
+                        shouldExitFromMainMenu = true;
+                        labelsMenu(reader);
                         break;
                     case "exit":
                         return;
@@ -71,107 +76,100 @@ public class GsonView {
         }
     }
 
-    private void writersMenu() throws IOException {
+    private void writersMenu(BufferedReader reader) throws IOException {
         printMenuOptions(" Писатели ");
+        boolean shouldReturnToMainMenu = false;
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            String input;
-            while ((input = reader.readLine()) != null) {
-                switch (input) {
-                    case "1":
-                        printList(writerController.getAll(), List.of("posts"));
-                        break;
-                    case "2":
-                        // 2. Найти по ID
-                        break;
-                    case "3":
-                        //3. Добавить
-                        break;
-                    case "4":
-                        //4. Отредактировать
-                        break;
-                    case "5":
-                        //5. Удалить
-                        break;
-                    case "6":
-                        mainMenu();
-                        break;
-                    case "exit":
-                        return;
-                    default:
-                        System.out.println("Введены не корректные данные");
-                        break;
-                }
+        while (!shouldReturnToMainMenu) {
+            String input = reader.readLine();
+            switch (input) {
+                case "1":
+                    printList(writerController.getAll(), List.of("posts"));
+                    break;
+                case "2":
+                    // 2. Найти по ID
+                    break;
+                case "3":
+                    // 3. Добавить
+                    break;
+                case "4":
+                    // 4. Отредактировать
+                    break;
+                case "5":
+                    //deleteWriterById(reader);
+                    deleteById(reader, writerController, "писателя");
+                    break;
+                case "6":
+                    shouldReturnToMainMenu = true;
+                    break;
+                default:
+                    System.out.println("Введены не корректные данные");
+                    break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        mainMenu();
     }
 
-    private void postsMenu() throws IOException {
+    private void postsMenu(BufferedReader reader) throws IOException {
         printMenuOptions("Публикации");
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            String input;
-            while ((input = reader.readLine()) != null) {
-                switch (input) {
-                    case "1":
-                        printList(postController.getAll(), List.of("labels"));
-                        break;
-                    case "2":
-                        break;
-                    case "3":
-                        break;
-                    case "4":
-                        break;
-                    case "5":
-                        break;
-                    case "6":
-                        mainMenu();
-                        break;
-                    case "exit":
-                        return;
-                    default:
-                        System.out.println("Введены не корректные данные");
-                        break;
-                }
+        boolean shouldReturnToMainMenu = false;
+
+        while (!shouldReturnToMainMenu) {
+            String input = reader.readLine();
+            switch (input) {
+                case "1":
+                    printList(postController.getAll(), List.of("labels"));
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    break;
+                case "4":
+                    break;
+                case "5":
+                    deleteById(reader, postController, "публикации");
+                    break;
+                case "6":
+                    shouldReturnToMainMenu = true;
+                    break;
+                default:
+                    System.out.println("Введены не корректные данные");
+                    break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        mainMenu();
     }
 
-    private void labelsMenu() throws IOException {
+    private void labelsMenu(BufferedReader reader) throws IOException {
         printMenuOptions("  Лэйблы  ");
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            String input;
-            while ((input = reader.readLine()) != null) {
-                switch (input) {
-                    case "1":
-                        printList(labelController.getAll(), List.of());
-                        break;
-                    case "2":
-                        break;
-                    case "3":
-                        break;
-                    case "4":
-                        break;
-                    case "5":
-                        break;
-                    case "6":
-                        mainMenu();
-                        break;
-                    case "exit":
-                        return;
-                    default:
-                        System.out.println("Введены не корректные данные");
-                        break;
-                }
+        boolean shouldReturnToMainMenu = false;
+
+        while (!shouldReturnToMainMenu) {
+            String input = reader.readLine();
+            switch (input) {
+                case "1":
+                    printList(labelController.getAll(), List.of());
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    break;
+                case "4":
+                    break;
+                case "5":
+                    deleteById(reader, labelController, "лэйбла");
+                    break;
+                case "6":
+                    shouldReturnToMainMenu = true;
+                    break;
+                default:
+                    System.out.println("Введены не корректные данные");
+                    break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        mainMenu();
     }
 
     private void printMainMenu() {
@@ -203,7 +201,6 @@ public class GsonView {
         System.out.println("||  5. Удалить  по ID           ||");
         System.out.println("||  6. Вернуться в главное меню ||");
         System.out.println("||                              ||");
-        System.out.println("||   Наберите exit для выхода   ||");
         System.out.println("==================================\n\n\n");
 
     }
@@ -261,11 +258,18 @@ public class GsonView {
         return rowBuilder.toString();
     }
 
+    private void deleteById(BufferedReader reader, BaseController<?, String> controller, String entityName) throws IOException {
+        System.out.print("Введите ID " + entityName + " для удаления: ");
+        String id = reader.readLine();
+        controller.deleteById(id);
+        System.out.println("Запись с " + id + " успешно удалена");
+    }
+
     private void clearConsole() {
         for (int i = 0; i < 25; ++i) System.out.println();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         GsonView view = new GsonView();
         view.start();
     }
