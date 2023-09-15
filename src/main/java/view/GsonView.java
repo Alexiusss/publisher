@@ -29,14 +29,10 @@ public class GsonView {
     private PostController postController;
     private WriterController writerController;
 
-    private GsonView() {
-        this.gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .setPrettyPrinting()
-                .create();
-        labelController = new LabelController(new GsonLabelRepositoryImpl(gson, "src/main/resources/store/labels.json"));
-        postController = new PostController(new GsonPostRepositoryImpl(gson, "src/main/resources/store/posts.json"));
-        writerController = new WriterController(new GsonWriterRepositoryImpl(gson, "src/main/resources/store/writers.json"));
+    private GsonView(WriterRepository writerRepository, PostRepository postRepository, LabelRepository labelRepository) {
+        labelController = new LabelController(labelRepository);
+        postController = new PostController(postRepository);
+        writerController = new WriterController(writerRepository, postRepository);
     }
 
     private void start() {
@@ -270,7 +266,11 @@ public class GsonView {
     }
 
     public static void main(String[] args) {
-        GsonView view = new GsonView();
+        GsonView view = new GsonView(
+                new GsonWriterRepositoryImpl("src/main/resources/store/writers.json"),
+                new GsonPostRepositoryImpl("src/main/resources/store/posts.json"),
+                new GsonLabelRepositoryImpl("src/main/resources/store/labels.json")
+        );
         view.start();
     }
 }

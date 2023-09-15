@@ -1,7 +1,7 @@
 package repository.post;
 
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import com.google.gson.GsonBuilder;
 import model.Post;
 import model.PostStatus;
 
@@ -11,11 +11,18 @@ import java.util.stream.Collectors;
 
 import static util.Util.*;
 
-@AllArgsConstructor
 public class GsonPostRepositoryImpl implements PostRepository {
 
     Gson gson;
     String fileName;
+
+    public GsonPostRepositoryImpl(String fileName) {
+        this.gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting()
+                .create();
+        this.fileName = fileName;
+    }
 
     @Override
     public Post getById(String id) throws IOException {
@@ -25,7 +32,7 @@ public class GsonPostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> getAllByWriterId(String writerId) throws IOException {
         return getListFromFile(gson, fileName, Post.class).stream()
-                .filter(writer -> writer.getId().equals(writerId))
+                .filter(post -> post.getWriterId().equals(writerId))
                 .collect(Collectors.toList());
     }
 

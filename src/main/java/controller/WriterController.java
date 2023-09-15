@@ -1,10 +1,22 @@
 package controller;
 
 import model.Writer;
-import repository.GenericRepository;
+import repository.post.PostRepository;
+import repository.writer.WriterRepository;
+import service.WriterService;
+
+import java.io.IOException;
 
 public class WriterController extends BaseController<Writer, String>{
-    public WriterController(GenericRepository<Writer, String> repository) {
-        super(repository);
+
+    WriterService service;
+
+    public WriterController(WriterRepository writerRepository, PostRepository postRepository) {
+        super(writerRepository);
+        service = new WriterService(writerRepository, postRepository);
+    }
+
+    public Writer getByIdWithPosts(String id) throws IOException {
+        return service.getByIdWithPosts(id);
     }
 }

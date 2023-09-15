@@ -17,6 +17,14 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
     Gson gson;
     String fileName;
 
+    public GsonWriterRepositoryImpl(String fileName) {
+        this.gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting()
+                .create();
+        this.fileName = fileName;
+    }
+
     @Override
     public Writer getById(String id) throws IOException {
        return getByIdFromList(getListFromFile(gson, fileName, Writer.class), id);

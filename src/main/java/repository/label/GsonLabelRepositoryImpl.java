@@ -1,7 +1,7 @@
 package repository.label;
 
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import com.google.gson.GsonBuilder;
 import model.Label;
 import model.Status;
 
@@ -11,11 +11,18 @@ import java.util.stream.Collectors;
 
 import static util.Util.*;
 
-@AllArgsConstructor
 public class GsonLabelRepositoryImpl implements LabelRepository {
 
     Gson gson;
     String fileName;
+
+    public GsonLabelRepositoryImpl(String fileName) {
+        this.gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting()
+                .create();
+        this.fileName = fileName;
+    }
 
     @Override
     public Label getById(String id) throws IOException {
