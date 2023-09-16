@@ -1,7 +1,7 @@
 package repository.writer;
 
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import com.google.gson.GsonBuilder;
 import model.Status;
 import model.Writer;
 
@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import static util.Util.*;
 
-@AllArgsConstructor
 public class GsonWriterRepositoryImpl implements WriterRepository {
 
     Gson gson;

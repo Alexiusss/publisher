@@ -14,6 +14,7 @@ import repository.label.LabelRepository;
 import repository.post.GsonPostRepositoryImpl;
 import repository.post.PostRepository;
 import repository.writer.GsonWriterRepositoryImpl;
+import repository.writer.WriterRepository;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -87,13 +88,12 @@ public class GsonView {
                     printWriterWithPosts(reader, writerController);
                     break;
                 case "3":
-                    // 3. Добавить
+                    addNewWriter(reader, writerController);
                     break;
                 case "4":
-                    // 4. Отредактировать
+                    editWriter(reader, writerController);
                     break;
                 case "5":
-                    //deleteWriterById(reader);
                     deleteById(reader, writerController, "писателя");
                     break;
                 case "6":
@@ -105,6 +105,38 @@ public class GsonView {
             }
         }
         mainMenu();
+    }
+
+    private void addNewWriter(BufferedReader reader, WriterController writerController) throws IOException {
+        printEditorHeader();
+        System.out.print("Введите имя и фамилию: ");
+        String[] data = reader.readLine().split(" ");
+        Writer writer = new Writer(data[0], data[1], List.of(), Status.ACTIVE);
+        writerController.add(writer);
+        printEditorFooter();
+    }
+
+    private void editWriter(BufferedReader reader, WriterController writerController) throws IOException {
+        printEditorHeader();
+        System.out.print("Введите ID: ");
+        String id = reader.readLine();
+        Writer writer = writerController.getByIdWithPosts(id);
+        System.out.println("Текущие данные :");
+        System.out.println("Имя: " + writer.getFirstName() + " " + writer.getLastName());
+        System.out.println("Статус: " + writer.getStatus());
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
+        System.out.print("Введите имя: ");
+        String firstName = reader.readLine();
+        System.out.print("Введите фамилию: ");
+        String lastName = reader.readLine();
+        System.out.print("Введите статус: ");
+        Status status = Status.valueOf(reader.readLine());
+        System.out.println();
+        writer.setFirstName(firstName);
+        writer.setLastName(lastName);
+        writer.setStatus(status);
+        writerController.update(writer);
+        printEditorFooter();
     }
 
     private void postsMenu(BufferedReader reader) throws IOException {
@@ -241,6 +273,17 @@ public class GsonView {
                     .collect(Collectors.toList());
             System.out.println(posts);
         }
+    }
+
+    private void printEditorHeader(){
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Редактор");
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
+    }
+
+    private void printEditorFooter(){
+        System.out.println("Запись успешно обновлена");
+        System.out.println("-------------------------------------------------------------------------------------------------------------------");
     }
 
     private String createTableHeader(List<Field> fieldNames, List<String> ignoredFields) {
