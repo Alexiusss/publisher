@@ -28,7 +28,7 @@ public class Util {
         return list.stream()
                 .filter(entity -> entity.getId().equals(id))
                 .findAny()
-                .orElseThrow();
+                .orElse(null);
     }
 
     public static <T extends BaseEntity> List<T> getListFromFile(Gson gson, String fileName, Class<T> clazz) throws IOException {

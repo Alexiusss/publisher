@@ -1,15 +1,18 @@
 package view;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import controller.BaseController;
 import controller.LabelController;
 import controller.PostController;
 import controller.WriterController;
 import lombok.AllArgsConstructor;
 import model.BaseEntity;
+import model.Post;
+import model.Status;
+import model.Writer;
 import repository.label.GsonLabelRepositoryImpl;
+import repository.label.LabelRepository;
 import repository.post.GsonPostRepositoryImpl;
+import repository.post.PostRepository;
 import repository.writer.GsonWriterRepositoryImpl;
 
 import java.io.BufferedReader;
@@ -22,8 +25,6 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class GsonView {
-
-    private Gson gson;
 
     private LabelController labelController;
     private PostController postController;
@@ -83,7 +84,7 @@ public class GsonView {
                     printList(writerController.getAll(), List.of("posts"));
                     break;
                 case "2":
-                    // 2. Найти по ID
+                    printWriterWithPosts(reader, writerController);
                     break;
                 case "3":
                     // 3. Добавить
@@ -222,6 +223,24 @@ public class GsonView {
             System.out.println("Записи отсутствуют");
         }
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
+    }
+
+    private void printWriterWithPosts(BufferedReader reader, WriterController writerController) throws IOException {
+        System.out.print("Введите ID " + "писателя" + ": ");
+        String id = reader.readLine();
+        Writer writer = writerController.getByIdWithPosts(id);
+        if (writer == null) {
+            System.out.println("Писателя" + " с ID " + id + " не существует.");
+        } else {
+            System.out.println("ID: " + writer.id);
+            System.out.println("Имя: " + writer.getFirstName() + " " + writer.getLastName());
+            System.out.println("Статус: " + writer.getStatus());
+            System.out.print("Публикации : ");
+            List<String> posts = writer.getPosts().stream()
+                    .map(Post::getContent)
+                    .collect(Collectors.toList());
+            System.out.println(posts);
+        }
     }
 
     private String createTableHeader(List<Field> fieldNames, List<String> ignoredFields) {

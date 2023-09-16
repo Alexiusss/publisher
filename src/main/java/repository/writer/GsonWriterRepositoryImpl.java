@@ -27,7 +27,11 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
 
     @Override
     public Writer getById(String id) throws IOException {
-       return getByIdFromList(getListFromFile(gson, fileName, Writer.class), id);
+        List<Writer> list = getListFromFile(gson, fileName, Writer.class);
+        if (list.size() > 0) {
+            return getByIdFromList(list, id);
+        }
+        return new Writer();
     }
 
     @Override
