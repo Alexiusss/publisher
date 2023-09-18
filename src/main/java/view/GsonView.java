@@ -5,10 +5,7 @@ import controller.LabelController;
 import controller.PostController;
 import controller.WriterController;
 import lombok.AllArgsConstructor;
-import model.BaseEntity;
-import model.Post;
-import model.Status;
-import model.Writer;
+import model.*;
 import repository.label.GsonLabelRepositoryImpl;
 import repository.label.LabelRepository;
 import repository.post.GsonPostRepositoryImpl;
@@ -24,6 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The GsonView class provides a console-based interface for managing writers, posts, and labels.
+ * It allows users to perform various CRUD operations on these entities.
+ */
 @AllArgsConstructor
 public class GsonView {
 
@@ -151,6 +152,7 @@ public class GsonView {
                     printList(postController.getAll(), List.of("labels"));
                     break;
                 case "2":
+                    getAndPrintById(reader, postController, List.of("labels"));
                     break;
                 case "3":
                     break;
@@ -257,6 +259,19 @@ public class GsonView {
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
     }
 
+    private <T extends BaseEntity> T getAndPrintById(BufferedReader reader, BaseController<?, String> controller, List<String> ignoredFields) throws IOException {
+        System.out.print("Введите ID: ");
+        String id = reader.readLine();
+        BaseEntity entity = controller.getById(id);
+        if (entity != null) {
+            printList(List.of(entity), ignoredFields);
+            return (T) entity;
+        } else {
+            System.out.println("Записи с id " + id + " не существует");
+            return null;
+        }
+    }
+
     private void printWriterWithPosts(BufferedReader reader, WriterController writerController) throws IOException {
         System.out.print("Введите ID " + "писателя" + ": ");
         String id = reader.readLine();
@@ -275,7 +290,7 @@ public class GsonView {
         }
     }
 
-    private void printEditorHeader(){
+    private void printEditorHeader() {
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
         System.out.println("Редактор");
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
