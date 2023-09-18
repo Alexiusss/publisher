@@ -155,8 +155,10 @@ public class GsonView {
                     getAndPrintById(reader, postController, List.of("labels"));
                     break;
                 case "3":
+                    postsEditor(reader, postController, false);
                     break;
                 case "4":
+                    postsEditor(reader, postController, true);
                     break;
                 case "5":
                     deleteById(reader, postController, "публикации");
@@ -172,6 +174,35 @@ public class GsonView {
         mainMenu();
     }
 
+    private void postsEditor(BufferedReader reader, PostController postController, boolean isExisted) throws IOException {
+        printEditorHeader();
+        Post post = new Post();
+
+        if (isExisted) {
+            post = getAndPrintById(reader, postController, List.of("labels"));
+            if (post == null) {
+                return;
+            }
+        }
+
+        System.out.print("Введите содержание: ");
+        String content = reader.readLine();
+        System.out.print("Введите статус: ");
+        String status = reader.readLine();
+        System.out.print("Введите ID писателя: ");
+        String writerId = reader.readLine();
+        post.setContent(content);
+        post.setPostStatus(PostStatus.valueOf(status));
+        post.setWriterId(writerId);
+        printEditorFooter();
+
+        if (isExisted) {
+            postController.update(post);
+        } else {
+            postController.add(post);
+        }
+    }
+
     private void labelsMenu(BufferedReader reader) throws IOException {
         printMenuOptions("  Лэйблы  ");
 
@@ -184,10 +215,13 @@ public class GsonView {
                     printList(labelController.getAll(), List.of());
                     break;
                 case "2":
+                    getAndPrintById(reader, labelController, List.of());
                     break;
                 case "3":
+                    labelEditor(reader, labelController, false);
                     break;
                 case "4":
+                    labelEditor(reader, labelController, true);
                     break;
                 case "5":
                     deleteById(reader, labelController, "лэйбла");
@@ -201,6 +235,32 @@ public class GsonView {
             }
         }
         mainMenu();
+    }
+
+    private void labelEditor(BufferedReader reader, LabelController labelController, boolean isExisted) throws IOException {
+        printEditorHeader();
+        Label label = new Label();
+
+        if (isExisted) {
+            label = getAndPrintById(reader, postController, List.of("labels"));
+            if (label == null) {
+                return;
+            }
+        }
+
+        System.out.print("Введите название: ");
+        String name = reader.readLine();
+        System.out.print("Введите статус: ");
+        String status = reader.readLine();
+        label.setName(name);
+        label.setStatus(Status.valueOf(status));
+        printEditorFooter();
+
+        if (isExisted) {
+            labelController.update(label);
+        } else {
+            labelController.add(label);
+        }
     }
 
     private void printMainMenu() {
@@ -296,7 +356,7 @@ public class GsonView {
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
     }
 
-    private void printEditorFooter(){
+    private void printEditorFooter() {
         System.out.println("Запись успешно обновлена");
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
     }
