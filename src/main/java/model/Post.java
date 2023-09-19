@@ -3,7 +3,7 @@ package model;
 import com.google.gson.annotations.Expose;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @ToString(callSuper = true)
@@ -17,7 +17,7 @@ public class Post extends BaseEntity {
     public String content;
 
     @Expose
-    public LocalDateTime created;
+    public LocalDate created;
 
     @Expose(serialize = false)
     public List<Label> labels;

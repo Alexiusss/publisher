@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.Post;
 import model.PostStatus;
+import util.LocalDateAdapter;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,8 @@ public class GsonPostRepositoryImpl implements PostRepository {
     public GsonPostRepositoryImpl(String fileName) {
         this.gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
+                // https://stackoverflow.com/a/53246168
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe())
                 .setPrettyPrinting()
                 .create();
         this.fileName = fileName;
@@ -45,6 +49,7 @@ public class GsonPostRepositoryImpl implements PostRepository {
     public Post save(Post post) throws IOException {
         List<Post> postList = getListFromFile(gson, fileName, Post.class);
         post.setId(generateNewId());
+        post.setCreated(LocalDate.now());
         postList.add(post);
         saveToFile(postList, gson, fileName);
         return post;
